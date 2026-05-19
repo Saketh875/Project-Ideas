@@ -1,0 +1,324 @@
+
+<style>
+  :root { --gap: 12px; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); color: var(--color-text-primary); }
+  h2.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  .top { padding: 1.25rem 0 1rem; }
+  .top h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .top p { font-size: 14px; color: var(--color-text-secondary); }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 1rem 0; }
+  .pill { cursor: pointer; font-size: 13px; padding: 5px 14px; border-radius: 99px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-secondary); transition: all 0.15s; user-select: none; }
+  .pill.active { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+  .pill:hover:not(.active) { background: var(--color-background-tertiary); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--gap); padding-bottom: 2rem; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 8px; }
+  .card:hover { border-color: var(--color-border-secondary); }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .card-title { font-size: 15px; font-weight: 500; line-height: 1.35; }
+  .badge { font-size: 11px; padding: 2px 9px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
+  .b-beginner { background: #EAF3DE; color: #3B6D11; }
+  .b-intermediate { background: #FAEEDA; color: #854F0B; }
+  .card-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; }
+  .card-domain { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
+  .links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .link-btn { font-size: 12px; padding: 4px 10px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-info); background: var(--color-background-info); text-decoration: none; display: flex; align-items: center; gap: 4px; }
+  .link-btn:hover { opacity: 0.8; }
+  .tools { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tool-tag { font-size: 11px; padding: 2px 8px; border-radius: var(--border-radius-md); background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); }
+  .empty { text-align: center; padding: 3rem; color: var(--color-text-secondary); font-size: 14px; grid-column: 1/-1; }
+  .stats { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 0.5rem; }
+</style>
+
+<h2 class="sr-only">Hackathon project ideas with repositories and tools for beginner to intermediate engineering students</h2>
+
+<div class="top">
+  <h1>Hackathon project finder</h1>
+  <p>Curated ideas, repos &amp; tools — beginner to intermediate, all engineering domains</p>
+</div>
+
+<div class="filters" id="domain-filters"></div>
+<div class="filters" id="level-filters"></div>
+
+<div class="stats" id="stats"></div>
+<div class="grid" id="grid"></div>
+
+<script>
+const DATA = [
+  {
+    title: "Smart Attendance System using Face Recognition",
+    domain: "CS / AI", level: "beginner",
+    desc: "Build a real-time face recognition attendance system using a webcam. Great intro to OpenCV and ML pipelines.",
+    tools: ["Python", "OpenCV", "face_recognition", "SQLite"],
+    links: [
+      { label: "Base repo", url: "https://github.com/ageitgey/face_recognition" },
+      { label: "Tutorial", url: "https://realpython.com/face-recognition-with-python/" }
+    ]
+  },
+  {
+    title: "Air Quality Index Monitor",
+    domain: "IoT / ECE", level: "beginner",
+    desc: "Use an MQ-135 / PMS5003 sensor with a Raspberry Pi or Arduino to log and visualize air quality data locally.",
+    tools: ["Arduino / RPi", "MQ-135 sensor", "Python", "Matplotlib"],
+    links: [
+      { label: "Sensor lib", url: "https://github.com/GeorgK/MQ135" },
+      { label: "Project guide", url: "https://github.com/gab-oss/air-quality-monitor" }
+    ]
+  },
+  {
+    title: "Student Expense Tracker Web App",
+    domain: "CS / Web", level: "beginner",
+    desc: "A simple personal finance dashboard where students can log daily expenses, see charts, and set budgets.",
+    tools: ["React", "Firebase", "Chart.js"],
+    links: [
+      { label: "Starter repo", url: "https://github.com/kevintpeng/My-Expenses" },
+      { label: "Firebase docs", url: "https://firebase.google.com/docs/web/setup" }
+    ]
+  },
+  {
+    title: "Soil Moisture Smart Irrigation System",
+    domain: "AgriTech / ECE", level: "beginner",
+    desc: "Automate plant watering using a soil moisture sensor and relay module. Add a web dashboard for monitoring.",
+    tools: ["Arduino", "YL-69 sensor", "NodeMCU ESP8266", "Blynk IoT"],
+    links: [
+      { label: "Repo", url: "https://github.com/sparkfun/Soil_Moisture_Sensor" },
+      { label: "Blynk", url: "https://blynk.io/en/getting-started" }
+    ]
+  },
+  {
+    title: "Resume Parser & Job Matcher",
+    domain: "CS / NLP", level: "intermediate",
+    desc: "Parse uploaded resumes and match them to job descriptions using NLP similarity scores. Useful HR tool.",
+    tools: ["Python", "spaCy", "Flask", "PyMuPDF", "NLTK"],
+    links: [
+      { label: "spaCy resume parser", url: "https://github.com/OmkarPathak/pyresparser" },
+      { label: "spaCy docs", url: "https://spacy.io/usage" }
+    ]
+  },
+  {
+    title: "Pothole Detection using Computer Vision",
+    domain: "Civil / CV", level: "intermediate",
+    desc: "Detect potholes in road images using YOLOv8. Can be extended to a mobile app for civic reporting.",
+    tools: ["Python", "YOLOv8 (Ultralytics)", "OpenCV", "Roboflow"],
+    links: [
+      { label: "YOLOv8 repo", url: "https://github.com/ultralytics/ultralytics" },
+      { label: "Pothole dataset", url: "https://universe.roboflow.com/search?q=pothole" }
+    ]
+  },
+  {
+    title: "Real-Time Sign Language Translator",
+    domain: "CS / AI", level: "intermediate",
+    desc: "Classify hand gestures (ASL/ISL alphabets) in real time using MediaPipe and a lightweight CNN.",
+    tools: ["Python", "MediaPipe", "TensorFlow/Keras", "OpenCV"],
+    links: [
+      { label: "MediaPipe hands", url: "https://github.com/google/mediapipe" },
+      { label: "Sign detection repo", url: "https://github.com/nicknochnack/ActionDetectionforSignLanguage" }
+    ]
+  },
+  {
+    title: "Structural Load Calculator Web Tool",
+    domain: "Civil / Structural", level: "beginner",
+    desc: "A browser-based tool for students to compute beam loads, reactions, and bending moments with visualizations.",
+    tools: ["HTML/CSS/JS", "Math.js", "Chart.js"],
+    links: [
+      { label: "beambending lib", url: "https://github.com/alfredoq/BeamBending" },
+      { label: "Math.js", url: "https://mathjs.org/docs/" }
+    ]
+  },
+  {
+    title: "Mental Health Chatbot for Students",
+    domain: "CS / NLP", level: "intermediate",
+    desc: "A supportive chatbot using an LLM API with carefully prompt-engineered empathetic responses and local crisis resources.",
+    tools: ["Python", "Streamlit", "Anthropic API", "LangChain"],
+    links: [
+      { label: "LangChain starter", url: "https://github.com/langchain-ai/langchain" },
+      { label: "Streamlit docs", url: "https://docs.streamlit.io/" }
+    ]
+  },
+  {
+    title: "Campus Carpooling App",
+    domain: "CS / Mobile", level: "intermediate",
+    desc: "Match students traveling the same route using geo-location and real-time chat. Reduces commute cost and emissions.",
+    tools: ["React Native", "Firebase", "Google Maps API"],
+    links: [
+      { label: "RN maps repo", url: "https://github.com/react-native-maps/react-native-maps" },
+      { label: "Firebase auth", url: "https://firebase.google.com/docs/auth" }
+    ]
+  },
+  {
+    title: "EV Charging Station Finder",
+    domain: "EV / Web", level: "beginner",
+    desc: "Aggregate open EVSE data and plot charging stations on a map with live availability status.",
+    tools: ["React", "Leaflet.js", "Open Charge Map API"],
+    links: [
+      { label: "Open Charge API", url: "https://openchargemap.org/site/develop/api" },
+      { label: "Leaflet", url: "https://leafletjs.com/reference.html" }
+    ]
+  },
+  {
+    title: "Thermal Comfort Prediction Model",
+    domain: "Mech / ML", level: "intermediate",
+    desc: "Predict indoor thermal comfort using ASHRAE 55 parameters and a trained ML model on open datasets.",
+    tools: ["Python", "scikit-learn", "Pandas", "ASHRAE dataset"],
+    links: [
+      { label: "CBE comfort tool", url: "https://github.com/CenterForTheBuiltEnvironment/pythermalcomfort" },
+      { label: "ASHRAE dataset", url: "https://www.kaggle.com/datasets/claytonmiller/ashrae-great-energy-predictor" }
+    ]
+  },
+  {
+    title: "Smart Pill Reminder & Tracker",
+    domain: "Biomedical / IoT", level: "beginner",
+    desc: "IoT pill box with a buzzer + display that sends medication reminders via Telegram bot.",
+    tools: ["ESP32", "OLED Display", "Telegram Bot API", "MicroPython"],
+    links: [
+      { label: "ESP32 micropython", url: "https://github.com/micropython/micropython" },
+      { label: "Telegram bot docs", url: "https://core.telegram.org/bots/api" }
+    ]
+  },
+  {
+    title: "Open-Source Inventory Management System",
+    domain: "CS / Web", level: "intermediate",
+    desc: "A full-stack CRUD app for managing stock, generating reports, and sending low-stock alerts via email.",
+    tools: ["Node.js", "Express", "PostgreSQL", "React"],
+    links: [
+      { label: "Snipe-IT (reference)", url: "https://github.com/snipe/snipe-it" },
+      { label: "PERN stack guide", url: "https://github.com/bchiang7/pern-starter" }
+    ]
+  },
+  {
+    title: "Water Leakage Detection System",
+    domain: "Civil / IoT", level: "beginner",
+    desc: "Use flow sensors to detect anomalies in water pipe data and alert via SMS/email when leaks are suspected.",
+    tools: ["Arduino", "YF-S201 sensor", "Twilio SMS", "Python"],
+    links: [
+      { label: "Flow sensor lib", url: "https://github.com/sekJohnny/Arduino-water-flow-sensor-YF-S201" },
+      { label: "Twilio docs", url: "https://www.twilio.com/docs/sms/quickstart/python" }
+    ]
+  },
+  {
+    title: "Fake News Detector",
+    domain: "CS / NLP", level: "intermediate",
+    desc: "Train a text classification model on labeled news datasets to flag potentially false articles.",
+    tools: ["Python", "scikit-learn", "HuggingFace Transformers", "Gradio"],
+    links: [
+      { label: "LIAR dataset", url: "https://github.com/thiagorainmaker77/liar_dataset" },
+      { label: "HuggingFace", url: "https://huggingface.co/docs/transformers/index" }
+    ]
+  },
+  {
+    title: "3D-Printed Prosthetic Hand Controller",
+    domain: "Biomedical / Robotics", level: "intermediate",
+    desc: "Control a 3D-printed hand using EMG sensor signals and servo motors. Printable files freely available.",
+    tools: ["Arduino", "MyoWare EMG", "Servo Motors", "3D print files"],
+    links: [
+      { label: "Open Bionics files", url: "https://github.com/Open-Bionics/Almond-Hand" },
+      { label: "EMG tutorial", url: "https://learn.sparkfun.com/tutorials/myoware-muscle-sensor-kit" }
+    ]
+  },
+  {
+    title: "Energy Usage Dashboard for Hostels",
+    domain: "EE / Data", level: "beginner",
+    desc: "Visualize electricity usage patterns from smart meter CSV exports and suggest savings using simple analytics.",
+    tools: ["Python", "Pandas", "Streamlit", "Plotly"],
+    links: [
+      { label: "Smart meter dataset", url: "https://www.kaggle.com/datasets/jeanmidev/smart-meters-in-london" },
+      { label: "Streamlit", url: "https://docs.streamlit.io/" }
+    ]
+  },
+  {
+    title: "Autonomous Line-Following Robot",
+    domain: "Robotics / ECE", level: "beginner",
+    desc: "Classic hackathon hardware build. IR sensors + PID control on an Arduino chassis follow a black line track.",
+    tools: ["Arduino UNO", "IR sensor array", "L298N motor driver", "C++"],
+    links: [
+      { label: "PID tuning guide", url: "https://github.com/br3ttb/Arduino-PID-Library" },
+      { label: "Project repo", url: "https://github.com/ForceTronics/LineFollowingRobot" }
+    ]
+  },
+  {
+    title: "Crop Disease Detection App",
+    domain: "AgriTech / CV", level: "intermediate",
+    desc: "Upload or click a photo of a diseased leaf to identify crop disease using a pretrained CNN (PlantVillage).",
+    tools: ["Python", "TensorFlow/Keras", "Streamlit", "PlantVillage dataset"],
+    links: [
+      { label: "PlantVillage model", url: "https://github.com/imskr/Plant_Disease_Detection" },
+      { label: "Dataset", url: "https://www.kaggle.com/datasets/vipoooool/new-plant-diseases-dataset" }
+    ]
+  }
+];
+
+const DOMAINS = [...new Set(DATA.map(d => d.domain.split(" / ")[0]))].sort();
+const LEVELS = ["beginner", "intermediate"];
+
+let activeDomains = new Set(DOMAINS);
+let activeLevels = new Set(LEVELS);
+
+function renderFilters() {
+  const df = document.getElementById("domain-filters");
+  const lf = document.getElementById("level-filters");
+  df.innerHTML = '';
+  lf.innerHTML = '';
+
+  DOMAINS.forEach(d => {
+    const p = document.createElement("span");
+    p.className = "pill" + (activeDomains.has(d) ? " active" : "");
+    p.textContent = d;
+    p.onclick = () => { activeDomains.has(d) ? activeDomains.delete(d) : activeDomains.add(d); render(); };
+    df.appendChild(p);
+  });
+
+  LEVELS.forEach(l => {
+    const p = document.createElement("span");
+    p.className = "pill" + (activeLevels.has(l) ? " active" : "");
+    p.textContent = l.charAt(0).toUpperCase() + l.slice(1);
+    p.onclick = () => { activeLevels.has(l) ? activeLevels.delete(l) : activeLevels.add(l); render(); };
+    lf.appendChild(p);
+  });
+}
+
+function render() {
+  renderFilters();
+  const filtered = DATA.filter(d => {
+    const dom = d.domain.split(" / ")[0];
+    return activeDomains.has(dom) && activeLevels.has(d.level);
+  });
+
+  const grid = document.getElementById("grid");
+  const stats = document.getElementById("stats");
+  stats.textContent = filtered.length + " of " + DATA.length + " projects shown";
+  grid.innerHTML = '';
+
+  if (!filtered.length) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "No projects match. Try selecting more filters.";
+    grid.appendChild(e);
+    return;
+  }
+
+  filtered.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const badgeCls = p.level === "beginner" ? "b-beginner" : "b-intermediate";
+    const toolHtml = p.tools.map(t => `<span class="tool-tag">${t}</span>`).join('');
+    const linkHtml = p.links.map(l =>
+      `<a class="link-btn" href="${l.url}" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true" style="font-size:12px"></i>${l.label}</a>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="card-title">${p.title}</div>
+        <span class="badge ${badgeCls}">${p.level}</span>
+      </div>
+      <div class="card-domain">${p.domain}</div>
+      <div class="card-desc">${p.desc}</div>
+      <div class="tools">${toolHtml}</div>
+      <div class="links">${linkHtml}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+render();
+</script>
